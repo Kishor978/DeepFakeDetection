@@ -66,6 +66,31 @@ class VideoReader:
 
         capture.release()
         return result
+    
+    def read_frames_at_indices(self, path, frame_idxs):
+        """Reads frames from a video and puts them into a NumPy array.
+
+        Arguments:
+            path: the video file
+            frame_idxs: a list of frame indices. Important: should be
+                sorted from low-to-high! If an index appears multiple
+                times, the frame is still read only once.
+
+        Returns:
+            - a NumPy array of shape (num_frames, height, width, 3)
+            - a list of the frame indices that were read
+
+        Reading stops if loading a frame fails, in which case the first
+        dimension returned may actually be less than num_frames.
+
+        Returns None if an exception is thrown for any reason, or if no
+        frames were read.
+        """
+        assert len(frame_idxs) > 0
+        capture = cv2.VideoCapture(path)
+        result = self._read_frames_at_indices(path, capture, frame_idxs)
+        capture.release()
+        return result
 
 
     def _read_frames_at_indices(self, path, capture, frame_idxs):
@@ -102,3 +127,52 @@ class VideoReader:
             if self.verbose:
                 print("Exception while reading movie %s" % path)
             return None    
+
+    def read_middle_frame(self, path):
+        """Reads the frame from the middle of the video."""
+        capture = cv2.VideoCapture(path)
+        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        result = self._read_frame_at_index(path, capture, frame_count // 2)
+        capture.release()
+        return result
+    
+    def read_frame_at_index(self, path, frame_idx):
+        """Reads a single frame from a video.
+        
+        If you just want to read a single frame from the video, this is more
+        efficient than scanning through the video to find the frame. However,
+        for reading multiple frames it's not efficient.
+        
+        Returns a NumPy array of shape (1, H, W, 3) and the index of the frame,
+        or None if reading failed.
+        """
+        capture = cv2.VideoCapture(path)
+        result = self._read_frame_at_index(path, capture, frame_idx)
+        capture.release()
+        return result
+    
+    def _read_frame_at_index(self, path, capture, frame_idx):
+        capture.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
+        ret, frame = capture.read()    
+        if not ret or frame is None:
+            if self.verbose:
+                print("Error retrieving frame %d from movie %s" % (frame_idx, path))
+            return None
+        else:
+            frame = self._postprocess_frame(frame)
+            return np.expand_dims(frame, axis=0), [frame_idx]
+
+    def _postprocess_frame(self, frame):
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        if self.insets[0] > 0:
+            W = frame.shape[1]
+            p = int(W * self.insets[0])
+            frame = frame[:, p:-p, :]
+
+        if self.insets[1] > 0:
+            H = frame.shape[1]
+            q = int(H * self.insets[1])
+            frame = frame[q:-q, :, :]
+
+        return frame
