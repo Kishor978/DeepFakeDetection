@@ -1,0 +1,33 @@
+import torch
+import torch.nn as nn 
+from torchvision import transforms
+from timm import create_model
+
+
+class Encoder(nn.Module):
+    def __init__(self):
+        super().__init__()
+        
+        self.features= nn.Sequential(
+            nn.Conv2d(3,16,kernel_size=(3,3),stride=(1,1),padding=(1,1)),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(2,2),stride=(2,2),padding=0),
+            
+            nn.Conv2d(16, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0),
+
+            nn.Conv2d(32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0),
+
+            nn.Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)),
+
+            nn.Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0)
+            )
+            
+        
