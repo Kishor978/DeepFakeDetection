@@ -52,4 +52,5 @@ class Decoder(nn.Module):
 
         )
         
-        
+        def forward(self,x):
+            return self.features(x)
