@@ -26,3 +26,22 @@ class Embedder(nn.Module):
                 feature_size=backbone_output.shape[-2]
                 feature_dim=backbone_output.shape[-1]
                 backbone.train(training)
+                
+        else:
+            feature_size=(feature_size,feature_size)
+            if hasattr(self.backbone,'feature_info'):
+                feature_dim=self.backbone.feature_info.channels()[-1]
+            else:
+                feature_dim=self.backbone.num_features
+        
+        assert feature_size[0]%patch_size[0]== 0 and feature_size[1]%patch_size[1]==0
+        self.grid_size=feature_size[0]//patch_size[0],feature_size[1]//patch_size[1]
+        self.num_patches=self.grid_size[0]*self.grid_size[1]
+        self.proj=nn.Conv2d(feature_dim,embed_dim,kernel_size=patch_size,stride=patch_size)
+
+    def forward(self,x):
+        x=self.backbone(x)
+        if isinstance(x,(list,tuple)):
+            x=x[-1]
+        x-self.proj(x).flatten(2).transpose(1,2)
+        return x
