@@ -40,3 +40,24 @@ class Encoder(nn.Module):
         self.kl=0
         self.kl_weight=0.5
         self.relu=nn.LeakyReLU()
+        
+    def reparameterize(self,x):
+        """This function is generating a latent vector z from the mean (mu) and variance (std)
+        parameters produced by the encoder. It implements the reparameterization trick, 
+        which allows for backpropagation through the sampling process."""
+        std = torch.exp(0.5 * self.mu(x))  # standard deviation
+        eps = torch.randn_like(std)           #Generate Random Noise
+        z = eps * std + self.mu(x)
+        
+        return z,std
+    
+    def forward(self,x):
+        x=self.features()
+        x=torch.flatten(x,start_dim=1)
+        mu=self.mu(x)
+        var=self.var(x)
+        z,_=self.reparameterize(x)
+        #  Kullback-Leibler (KL) Divergence used as the loss function  during training 
+        # encourage the learned latent space to be close to a standard Gaussian distribution.
+        self.kl = self.kl_weight*torch.mean(-0.5*torch.sum(1+var - mu**2 - var.exp(), dim=1), dim=0) 
+        return z
