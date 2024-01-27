@@ -3,6 +3,7 @@ import torch.nn as nn
 from torchvision import transforms
 from timm import create_model
 
+from model_embedder import Embedder
 
 class Encoder(nn.Module):
     def __init__(self):
@@ -52,5 +53,31 @@ class Decoder(nn.Module):
 
         )
         
-        def forward(self,x):
-            return self.features(x)
+    def forward(self,x):
+        return self.features(x)
+        
+class ConvAutoEncoder(nn.Module):
+    def __init__(self,config,pretrained=True):
+        super(ConvAutoEncoder,self).__inti__()
+        self.encoder=Encoder()
+        self.decoder=Decoder()
+        self.backbone=create_model(config['model']['backbone'],pretrained=pretrained)
+        self.embedder=create_model(config['model']['embedder'],pretrained=pretrained)
+        self.backbone.patch_embd=Embedder(self.embedder,img_size=config['img_size'],embed_dim=768)
+        self.num_features=self.backbone.head.fc.out_features*2
+        self.fc=nn.Linear(self.num_features,self.num_features//4)
+        self.fc2=nn.Linear(self.num_features//4,2)
+        self.relu=nn.GELU()
+        
+    def forward(self,images):
+        enc_img=self.encoder(images)
+        dec_img=self.decoder(enc_img)
+        
+        x1=self.backbone(dec_img)
+        x2=self.backbone(images)
+        
+        x=torch.cat((x1,x2),dim=1)
+        
+        x=self.fc2(self.relu(self.fc(self.relu(x))))
+        
+        return x
