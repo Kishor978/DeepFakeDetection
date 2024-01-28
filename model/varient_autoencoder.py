@@ -3,7 +3,9 @@ from torch import nn
 from torchvision import transforms 
 from timm import create_model 
 from config import load_config
-  
+
+from model_embedder import Embedder  
+
 class Encoder(nn.Module):
     """Encoder in a variational autoencoder (VAE). 
     It is responsible for transforming input images into a lower-dimensional representation. 
@@ -91,3 +93,14 @@ class Decoder(nn.Module):
         x = self.unflatten(x)
         x = self.features(x)
         return x
+    
+    
+class ConvVAE(nn.Module):
+    def __init__(self,config,pretrained=True):
+        super(ConvVAE,self).__init__()
+        
+        self.latent_dims=config['model']['latent_dims']
+        self.encoder=Encoder(self.latent_dims)
+        self.decoder=Decoder(self.latent_dims)
+        self.embedder=create_model(['model'],['embedder'],pretrained=pretrained)
+        self.convnext_backbone=
