@@ -20,8 +20,18 @@ class ConSwinT(nn.Module):
                 self.model_ed.load_state_dict(self.checkpoint_ed)
                 self.model_ed.eval()
                 if self.fp16:
-                    self.model_ed.helf()
+                    self.model_ed.half()
             except FileNotFoundError:
                 raise Exception(f"Error: weight/{ed}.pth file not found.")
-        elif self.net=='var':
+        elif self.net=='vae':
+            try:
+                self.model_vae=ConvVAE(config)
+                self.checkpoint_vae = torch.load(f'weight/{vae}.pth', map_location=torch.device('cpu'))
+                self.model_vae.load_state_dict(self.checkpoint_vae)
+                self.model_vae.eval()
+                if self.fp16:
+                    self.model_vae.half()
+            except FileNotFoundError:
+                raise Exception(f"Error: weight/{vae}.pth file not found.")
+        else:
             try:
