@@ -102,5 +102,25 @@ class ConvVAE(nn.Module):
         self.latent_dims=config['model']['latent_dims']
         self.encoder=Encoder(self.latent_dims)
         self.decoder=Decoder(self.latent_dims)
-        self.embedder=create_model(['model'],['embedder'],pretrained=pretrained)
-        self.convnext_backbone=
+        self.embedder=create_model(['model'],['embedder'],pretrained=True)
+        self.convnext_backbone=create_model(['model']['backbone'],pretrained=True,
+                                            num_classes=1000,drop_path_rate=0,head_init_scale=1.0)
+        self.convnext_backbone.patch_embd=Embedder(self.embedder,img_size=config['img_size'],embed_dim=768)
+        self.num_feature=self.convnext_backbone.head.fc.out_features*2
+        
+        self.fc=nn.Linear(self.num_feature,self.num_feature//4)
+        self.fc3=nn.Linear(self.num_feature//2,self.num_feature//4)
+        self.fc2=nn.Linear(self.num_feature//4,config['num_classes'])
+        self.relu=nn.ReLU()
+        self.resize = transforms.Resize((224,224), antialias=True)
+        
+    def forward(self,x):
+        z=self.encoder()
+        x_hat=self.decoder()
+        x1=self.convnext_backbone(x)
+        x2=self.convnext_backbone(x_hat)
+        
+        x=torch.cat((x,x2),dim=1)
+        x=self.fc2(self.relu(self.fc(self.relu(x))))
+        
+        return x,self.resize(x_hat)
