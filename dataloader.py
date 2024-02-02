@@ -107,3 +107,24 @@ def load_data(data_dir="sample/",batch_size=4):
     }
     
     return dataloader,dataset_sizes
+
+def load_checkpoint(model,optimizer,filename=None):
+    """function is designed to load a checkpoint file containing the state
+    of a model, optimizer, and other relevant information during training
+    """
+    start_epoch=0
+    log_loss=0
+    if os.path.isfile(filename):
+        print("=> loading checkpoint '{}'".format(filename))
+        checkpoint=torch.load(filename)
+        start_epoch=checkpoint["epoch"]
+        model.load_state_dict(checkpoint["state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer"])
+        log_loss=checkpoint["min_loss"]
+        print(
+            "=> loaded checkpoint '{}' (epoch {})".format(filename, checkpoint["epoch"])
+        )
+    else:
+        print("=> no checkpoint found at '{}'".format(filename))
+
+    return model, optimizer, start_epoch, log_loss
