@@ -18,6 +18,7 @@ from albumentations import (
     )
 
 def strong_aug(p=0.5):
+    """returns a composition of various image augmentation transformations"""
     return Compose(
         [
             RandomRotate90(p=0.2),
@@ -42,3 +43,25 @@ def strong_aug(p=0.5):
 def augument(aug,image):
     return aug(image=image)["image"]
 
+class Aug(object):
+    def __call__(self,img):
+        aug=strong_aug(p=0.9)
+        return Image.fromarray(augument(aug,np.array(img)))
+    
+def normalize_data():
+    mean= [0.485, 0.456, 0.406]
+    std=[0.229,0.224,0.225]
+    
+    return {
+        "train":transforms.Compose(
+            [Aug(),transforms.ToTensor(),transforms.Normalize(mean,std)]
+        ),
+        "valid":transforms.Compose(
+            [transforms.ToTensor(),transforms.Normalize(mean,std)]
+        ),
+        "test":transforms.Compose(
+            [transforms.ToTensor(),transforms.Normalize(mean,std)]
+        ),
+        "vid":transforms.Compose([transforms.Normalize(mean,std)])
+    }
+    
