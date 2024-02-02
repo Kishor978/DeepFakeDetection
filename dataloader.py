@@ -73,3 +73,37 @@ def load_data(data_dir="sample/",batch_size=4):
     
     image_datasets={x: datasets.ImageFolder(os.path.join(data_dir,x),normalize_data()[x])
                     for x in ["train","valid","test"]}
+    dataset_sizes={x:len(image_datasets[x])
+                   for x in ["train","valid","test"]}
+    
+    train_dataloaders=torch.utils.data.DataLoader(
+        image_datasets["train"],
+        batch_size,
+        shuffle=True,
+        num_workers=0,
+        pin_memory=True,
+    )
+    
+    validation_dataloaders=torch.utils.data.DataLoader(
+        image_datasets["validation"],
+        batch_size,
+        shuffle=False,
+        num_workers=0,
+        pin_memory=True,
+    )
+    
+    test_dataloaders=torch.utils.data.DataLoader(
+        image_datasets["test"],
+        batch_size,
+        shuffle=False,
+        num_workers=0,
+        pin_memory=True,
+    )
+    
+    dataloader={
+        "train":train_dataloaders,
+        "validation":validation_dataloaders,
+        "test":test_dataloaders,
+    }
+    
+    return dataloader,dataset_sizes
