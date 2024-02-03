@@ -30,3 +30,37 @@ def train(model,device,train_loader,criterion,
         optimizer.zero_grad()
         output=model(images).squeeze()
         loss=criterion(output,targets)
+        
+        loss.backward()
+        optimizer.step()
+        curr_loss+=loss.sum().item()
+        _,preds=torch.max(output,1)
+        t_pred+=torch.sum(preds==targets.data).item()
+        
+        if batch_idx%10==0:
+            print(
+                "Train Epoch:{} [{}/{} ({:.0f}%)]\t loss: {:.6f}".format(
+                    epoch,batch_idx*len(images),
+                    len(train_loader.dataset),
+                    100.0*batch_idx/len(train_loader),
+                    loss.item(),
+                )
+            )
+            train_loss.append(loss.sum().item()/len(images))
+            train_acc.append(loss.sum().item()/len(images))
+    epoch_loss=curr_loss/len(train_loader.dataset)
+    epoch_acc=curr_loss/len(train_loader.dataset)
+    train_loss.append(epoch_loss)
+    train_acc.append(epoch_acc)
+    
+    print(
+        "\nTrain set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
+            epoch_loss,
+            t_pred,
+            len(train_loader.dataset),
+            100.0 * t_pred / len(train_loader.dataset),
+        )
+    )
+
+    return train_loss, train_acc, epoch_loss
+
