@@ -18,6 +18,19 @@ device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def train_model(dir_path,mod,num_epochs,pretrained_model_filename,
                 test_model, batch_size):
+    """This function is designed to train a CNN model, either an Autoencoder (AE)
+    or a Variational Autoencoder (VAE), based on the specified mode. It uses the 
+    PyTorch framework for training and validation, saving checkpoints, and optionally 
+    testing the model. The function supports training from scratch or continuing training from a pretrained model.
+
+    Parameters:
+        dir_path: The directory path containing the training, validation, and test datasets.
+        mod: A string indicating the mode of the model, either "ed" (Autoencoder) or another value (VAE).
+        num_epochs: The number of training epochs.
+        pretrained_model_filename: The filename/path of the pretrained model checkpoint file (optional).
+        test_model: A boolean indicating whether to perform testing after training.
+        batch_size: The batch size for training.
+    """
     print("Loading data....")
     dataloaders,dataset_size=load_data(dir_path,batch_size)
     print("Loadibg data is completed...")
@@ -142,3 +155,14 @@ def test(model,dataloaders,dataset_size,mod,weight):
             output=model(inputs)[0].to(device).float()
         
         _,prediction=torch.max(output,1)
+        
+        pred_label=labels[prediction]
+        pred_label=pred_label.detach().cpu().numpy()
+        main_label=labels.detach().cpu().numpy()
+        bool_list = list(map(lambda x, y: x == y, pred_label, main_label))
+        Sum+=sum(np.array(bool_list)*1)
+        counter+=1
+        print(f"Prediction:{Sum}/{len(imputs)*counter}")
+    print(f'Prediction:{Sum}/{dataset_size["test"]}{(Sum/dataset_size["test"])*100:.2f}%')
+    
+    
