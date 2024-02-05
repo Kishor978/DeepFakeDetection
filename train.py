@@ -92,3 +92,53 @@ def train_model(dir_path,mod,num_epochs,pretrained_model_filename,
     
     if test_model:
         test(model,dataloaders,dataset_size,mod,weight )
+        
+def load_pretrained(pretrained_model_filename):
+    """function is loads a pretrained model and its optimizer from a saved checkpoint file.
+    It checks the existence of the specified checkpoint file, attempts to load the model, 
+    optimizer, starting epoch, and minimum loss using a load_checkpoint function 
+    and then moves the optimizer's state to the specified device.
+
+"""
+    assert os.path.isfile(
+        pretrained_model_filename), "Saved model file does not exist...\nExiting!!!!"
+    model,optimizer,start_epoch,min_loss=load_checkpoint(
+    )
+    
+    for state in optimizer.state.values():
+        for k,v in state.item():
+            if isinstance(v,torch.Tensor):
+                state[k]=v.to(device)
+    return model,optimizer,start_epoch,min_loss
+
+
+def test(model,dataloaders,dataset_size,mod,weight):
+    """It loads a pretrained model from a given checkpoint file, sets the model to 
+    evaluation mode, and iterates over batches of the test dataset to make predictions.
+    It compares the predicted labels with the ground truth labels, counts the number of 
+    correct predictions, and prints the overall accuracy.
+
+    Parameters:
+        model: The PyTorch model to be evaluated.
+        dataloaders: A dictionary containing PyTorch data loaders for the test dataset.
+        dataset_sizes: A dictionary containing the sizes of different datasets (e.g., "test").
+        mod: A string indicating the mode ("ed" or other) used for prediction.
+        weight: The filename/path of the checkpoint file containing pretrained weights.
+    """
+    print("\nRunning test.....\n")
+    model.eval()
+    check_point=torch.load(weight,map_location="cpu")
+    model.load_state_dict(check_point["state_dict"])
+    _=model.eval()
+    
+    Sum=0
+    counter=0
+    for imputs,labels in dataloaders["test"]:
+        inputs=inputs.to(device)
+        labels=labels.to(device)
+        if mod== "ed":
+            output=model(inputs).to(device).float()
+        else:
+            output=model(inputs)[0].to(device).float()
+        
+        _,prediction=torch.max(output,1)
