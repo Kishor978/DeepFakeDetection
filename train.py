@@ -7,6 +7,7 @@ from torch.optim import lr_scheduler
 import time
 from time import perf_counter
 import pickle
+import optparse
 
 from model.config import load_config
 from dataloader import load_data,load_checkpoint
@@ -165,4 +166,39 @@ def test(model,dataloaders,dataset_size,mod,weight):
         print(f"Prediction:{Sum}/{len(imputs)*counter}")
     print(f'Prediction:{Sum}/{dataset_size["test"]}{(Sum/dataset_size["test"])*100:.2f}%')
     
+def gen_parser():
+    """This function creates and configures an option parser for command-line arguments.
+    It parses the provided command-line arguments and returns a tuple containing the parsed values.
+    """
     
+    parser=optparse.OptionParser("Train ConSwinT model")
+    parser.add_option("-e","--epoch",type=int,dest="epoch",
+                      help="Number of epochs used for training the ConSwinT.")
+    parser.add_option("-v","--version",dest="version",help="version 0.1.1")
+    parser.add_option("-d","--dir",dest="dir",help="Training data path")
+    parser.add_option("-m","--model",dest="model",help="model ed or vae")
+    parser.add_option("-p","--pretrained",dest="pretrained",
+                      help="Saved model file name. If you want to continue from the previous trained model")
+    parser.add_option("-t","--test",dest="test",help="run test on test dataset")
+    parser.add_option("-b","--batch_size",dest="batch_size",help="batch size.")
+    
+    (options,_)=parser.parse_args()
+    dir_path=options.dir 
+    epoch=options.epoch
+    mod="ed" if options.model=="ed" else "vae"
+    test_model="y" if options.test else None
+    pretrained_model_filename=options.pretrained if options.pretrained else None
+    batch_size=options.batch_size if options.batch_size else config["batch_size"]
+    
+    return dir_path,epoch,mod,test_model,pretrained_model_filename,batch_size
+
+def main():
+    start_time = perf_counter()
+    path, mod, epoch, pretrained_model_filename, test_model, batch_size = gen_parser()
+    train_model(path, mod, epoch, pretrained_model_filename, test_model, batch_size)
+    end_time = perf_counter()
+    print("\n\n--- %s seconds ---" % (end_time - start_time))
+
+
+if __name__ == "__main__":
+    main()

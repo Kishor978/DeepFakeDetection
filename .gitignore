@@ -162,5 +162,5 @@ cython_debug/
 \dlib-19.24.1-cp311-cp311-win_amd64.whl
 *.whl
 preprocesses/
-
+sample_train_data/
 face_extraction.py

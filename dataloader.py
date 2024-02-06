@@ -85,7 +85,7 @@ def load_data(data_dir="sample/",batch_size=4):
     )
     
     validation_dataloaders=torch.utils.data.DataLoader(
-        image_datasets["validation"],
+        image_datasets["valid"],
         batch_size,
         shuffle=False,
         num_workers=0,

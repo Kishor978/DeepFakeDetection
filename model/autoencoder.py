@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision import transforms
 from timm import create_model
 
-from model_embedder import Embedder
+from .model_embedder import Embedder
 
 class Encoder(nn.Module):
     def __init__(self):

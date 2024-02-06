@@ -2,9 +2,11 @@ import torch
 from torch import nn 
 from torchvision import transforms 
 from timm import create_model 
-from config import load_config
+from .config import load_config
 
-from model_embedder import Embedder  
+from .model_embedder import Embedder  
+
+conifg=load_config()
 
 class Encoder(nn.Module):
     """Encoder in a variational autoencoder (VAE). 
@@ -68,7 +70,7 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     """Decoder in a variational autoencoder (VAE). 
     Is responsible for transforming the latent vector back into an image by using transpose convolutional layers"""
-    def __int__(self,latent_dims=4):
+    def __init__(self,latent_dims=4):
         super(Decoder,self).__init__()
         
         self.features = nn.Sequential(
@@ -102,8 +104,8 @@ class ConvVAE(nn.Module):
         self.latent_dims=config['model']['latent_dims']
         self.encoder=Encoder(self.latent_dims)
         self.decoder=Decoder(self.latent_dims)
-        self.embedder=create_model(['model'],['embedder'],pretrained=True)
-        self.convnext_backbone=create_model(['model']['backbone'],pretrained=True,
+        self.embedder=create_model(config['model']['embedder'],pretrained=True)
+        self.convnext_backbone=create_model(config['model']['backbone'],pretrained=True,
                                             num_classes=1000,drop_path_rate=0,head_init_scale=1.0)
         self.convnext_backbone.patch_embd=Embedder(self.embedder,img_size=config['img_size'],embed_dim=768)
         self.num_feature=self.convnext_backbone.head.fc.out_features*2
@@ -116,11 +118,11 @@ class ConvVAE(nn.Module):
         
     def forward(self,x):
         z=self.encoder()
-        x_hat=self.decoder()
+        x_hat=self.decoder(z)
         x1=self.convnext_backbone(x)
         x2=self.convnext_backbone(x_hat)
         
-        x=torch.cat((x,x2),dim=1)
+        x=torch.cat((x1,x2),dim=1)
         x=self.fc2(self.relu(self.fc(self.relu(x))))
         
         return x,self.resize(x_hat)
