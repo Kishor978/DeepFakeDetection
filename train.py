@@ -190,7 +190,7 @@ def gen_parser():
     pretrained_model_filename=options.pretrained if options.pretrained else None
     batch_size=options.batch_size if options.batch_size else config["batch_size"]
     
-    return dir_path,epoch,mod,test_model,pretrained_model_filename,batch_size
+    return dir_path,mod,epoch,pretrained_model_filename,test_model,int(batch_size)
 
 def main():
     start_time = perf_counter()

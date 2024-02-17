@@ -30,7 +30,7 @@ class Encoder(nn.Module):
             nn.BatchNorm2d(num_features=64),
             nn.LeakyReLU(),
             
-            nn.Conv2d(3,128,kernel_size=3,stride=2,padding=1),
+            nn.Conv2d(64,128,kernel_size=3,stride=2,padding=1),
             nn.BatchNorm2d(num_features=128),
             nn.LeakyReLU(),  
         )
@@ -49,17 +49,17 @@ class Encoder(nn.Module):
         """This function is generating a latent vector z from the mean (mu) and variance (std)
         parameters produced by the encoder. It implements the reparameterization trick, 
         which allows for backpropagation through the sampling process."""
-        std = torch.exp(0.5 * self.mu(x))  # standard deviation
+        std = torch.exp(0.5 * self.mean(x))  # standard deviation
         eps = torch.randn_like(std)           #Generate Random Noise
-        z = eps * std + self.mu(x)
+        z = eps * std + self.mean(x)
         
         return z,std
     
     def forward(self,x):
-        x=self.features()
+        x=self.features(x)
         x=torch.flatten(x,start_dim=1)
-        mu=self.mu(x)
-        var=self.var(x)
+        mu=self.mean(x)
+        var=self.variance(x)
         z,_=self.reparameterize(x)
         #  Kullback-Leibler (KL) Divergence used as the loss function  during training 
         # encourage the learned latent space to be close to a standard Gaussian distribution.
@@ -117,7 +117,7 @@ class ConvVAE(nn.Module):
         self.resize = transforms.Resize((224,224), antialias=True)
         
     def forward(self,x):
-        z=self.encoder()
+        z=self.encoder(x)
         x_hat=self.decoder(z)
         x1=self.convnext_backbone(x)
         x2=self.convnext_backbone(x_hat)
