@@ -147,7 +147,7 @@ def test(model,dataloaders,dataset_size,mod,weight):
     
     Sum=0
     counter=0
-    for imputs,labels in dataloaders["test"]:
+    for inputs,labels in dataloaders["test"]:
         inputs=inputs.to(device)
         labels=labels.to(device)
         if mod== "ed":
@@ -163,7 +163,7 @@ def test(model,dataloaders,dataset_size,mod,weight):
         bool_list = list(map(lambda x, y: x == y, pred_label, main_label))
         Sum+=sum(np.array(bool_list)*1)
         counter+=1
-        print(f"Prediction:{Sum}/{len(imputs)*counter}")
+        print(f"Prediction:{Sum}/{len(inputs)*counter}")
     print(f'Prediction:{Sum}/{dataset_size["test"]}{(Sum/dataset_size["test"])*100:.2f}%')
     
 def gen_parser():
