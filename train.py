@@ -85,7 +85,7 @@ def train_model(dir_path,mod,num_epochs,pretrained_model_filename,
     )
 
     print("\nSaving model....\n")
-    
+    os.makedirs("weight", exist_ok=True)
     file_path=os.path.join("weight",
         f'convSwinT_{mod}_{time.strftime("%b_%d_%Y_%H_%M_%S",time.localtime())}')
     
