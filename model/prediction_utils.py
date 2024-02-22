@@ -34,8 +34,34 @@ def load_conswint(net,fp16):
         model.half()
     return model
 
-def face_recog(frames,p=None,klass=None):
+def face_recog(frames):
+    """This function is designed for face recognition tasks.
+        Return:
+        If faces are detected (count > 0), return a tuple containing the list 
+        of cropped face images (temp_face[:count]) and the number of faces detected
+        (count). If no faces are detected (count == 0), return an empty list and 0.    
+    """
     temp_face=np.zeros((len(frames),224,224,3),dtype=np.uint8)
     count=0
-    mod='cnn'if dlib.DLID_USE_CUDA else "hog"
+    mod='cnn'if dlib.DLID_USE_CUDA else "hog"        #Histogram of Oriented Gradients               
+    for _,frame in tqdm(enumerate(frames),total=len(frames)):
+        frame=cv2.cvtColor(frame,cv2.COLOR_RGB2BGR)
+        face_locations=face_recognition.face_locations(
+            frame,number_of_times_to_upsample=0,model=mod
+        )
+        
+        for face_location in face_location:
+            if count<len(frames):
+                top,right,bottom,left=face_location
+                face_image=frame[top:bottom,left:right] 
+                face_image=cv2.resize(
+                    face_image,(224,224),interpolation=cv2.INTER_AREA
+                )
+                face_image=cv2.cvtColor(face_image,cv2.COLOR_BGR2RGB)
+                temp_face[count]=face_image
+                count+=1
+                
+            else:
+                break
+    return ([],0) if count==0 else (temp_face[:count],count)
      
