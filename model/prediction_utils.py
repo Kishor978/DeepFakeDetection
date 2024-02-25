@@ -104,3 +104,16 @@ def max_prediction_value(y_pred):
     
 def real_or_fake(prediction):
     return {0:"Real",1:"Fake"}[prediction^1]
+
+def extract_frames(video_file,frames_nums=10):
+    vr=VideoReader(video_file,ctx=cpu(0))
+    step_size=max(1,len(vr)//frames_nums)
+    return vr.get_batch(list(range(0,len(vr),step_size))[:frames_nums]).asnumpy()
+
+def df_face(vid,num_frames,net):
+    img=extract_frames(vid,num_frames)
+    face,count=face_recog(img)
+    return preprocess_frame(face)if count >0 else []
+
+def is_video(vid):
+    return os.path.isfile(vid)and vid.endswith(tuple([".avi", ".mp4", ".mpg", ".mpeg", ".mov"]))
