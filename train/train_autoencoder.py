@@ -49,7 +49,7 @@ def train(model,device,train_loader,criterion,
             train_loss.append(loss.sum().item()/len(images))
             train_acc.append(loss.sum().item()/len(images))
     epoch_loss=curr_loss/len(train_loader.dataset)
-    epoch_acc=curr_loss/len(train_loader.dataset)
+    epoch_acc=t_pred/len(train_loader.dataset)
     train_loss.append(epoch_loss)
     train_acc.append(epoch_acc)
     
@@ -81,7 +81,7 @@ def valid(model,device,test_loader,criterion,epoch,
             loss=criterion(output,targets)
             test_loss+=loss.sum().item()
             _,preds=torch.max(output,1)
-            correct+=torch.sum(preds=targets.data)
+            correct+=torch.sum(preds==targets.data)
             if batch_idx % 10 == 0:
                 print(
                     "Valid Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(

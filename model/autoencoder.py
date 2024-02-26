@@ -30,6 +30,9 @@ class Encoder(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0)
             )
+    def forward(self, x):
+        return self.features(x)
+
             
 class Decoder(nn.Module):
     def __init__(self):
@@ -58,7 +61,7 @@ class Decoder(nn.Module):
         
 class ConvAutoEncoder(nn.Module):
     def __init__(self,config,pretrained=True):
-        super(ConvAutoEncoder,self).__inti__()
+        super(ConvAutoEncoder,self).__init__()
         self.encoder=Encoder()
         self.decoder=Decoder()
         self.backbone=create_model(config['model']['backbone'],pretrained=pretrained)
