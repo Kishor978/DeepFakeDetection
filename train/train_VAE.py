@@ -33,7 +33,7 @@ def train(model,device,train_loader,criterion,optimizer,
                 )
             )
             train_loss.append(loss.sum().item()/len(images))
-            train_acc.append(loss.sum().item()/len(images))
+            train_acc.append(preds.sum().item()/len(images))
     epoch_loss= curr_loss/len(train_loader.dataset)
     epoch_acc=t_pred/len(train_loader.dataset)
     

@@ -72,7 +72,7 @@ def train_model(dir_path,mod,num_epochs,pretrained_model_filename,
                                               train_loss,train_acc,mse)
         
         valid_loss,valid_acc=valid(model,device,dataloaders["validation"],
-                                   criterion,epoch,valid_acc,valid_loss,mse)
+                                   criterion,epoch,valid_loss,valid_acc,mse)
         
         scheduler.step()
     
@@ -117,6 +117,7 @@ def load_pretrained(pretrained_model_filename):
     assert os.path.isfile(
         pretrained_model_filename), "Saved model file does not exist...\nExiting!!!!"
     model,optimizer,start_epoch,min_loss=load_checkpoint(
+        model, optimizer, filename=pretrained_model_filename
     )
     
     for state in optimizer.state.values():

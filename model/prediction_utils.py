@@ -26,9 +26,11 @@ def load_conswint(net,fp16):
             faster computation with reduced memory usage if supported by the hardware."""
     config=load_config()
     model=ConSwinT(
-        config,ed="conswint_ed_inference",
+        config,
+        ed="conswint_ed_inference",
         vae= "conswint_vae_inference",
-        net=net,fp16=fp16
+        net=net,
+        fp16=fp16
     )
     model.to(device)
     model.eval()
@@ -52,7 +54,7 @@ def face_recog(frames):
             frame,number_of_times_to_upsample=0,model=mod
         )
         
-        for face_location in face_location:
+        for face_location in face_locations:
             if count<len(frames):
                 top,right,bottom,left=face_location
                 face_image=frame[top:bottom,left:right] 
