@@ -74,7 +74,7 @@ class Decoder(nn.Module):
         super(Decoder,self).__init__()
         
         self.features = nn.Sequential(
-            nn.ConvTranspose2d(256, 64, kernel_size=2, stride=2),
+            nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),
             nn.LeakyReLU(),
 
             nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),
