@@ -9,8 +9,8 @@ class ConSwinT(nn.Module):
     weights based on the value of the net parameter. Depending on the 
     specified value of net, the forward pass of the model involves either 
     the ConvAutoEncoder model, the ConvVAE model, or both."""
-    def __init__(self,config,ed,vae,net,fp16):
-        super(ConSwinT,self).__init__()
+    def __init__(self, config, ed, vae, net, fp16):
+        super(ConSwinT, self).__init__()
         self.net = net
         self.fp16 = fp16
         if self.net=='ed':
@@ -48,6 +48,8 @@ class ConSwinT(nn.Module):
                     self.model_vae.half()
             except FileNotFoundError as e:
                 raise Exception(f"Error: Model weights file not found.")
+
+
     def forward(self, x):
         if self.net == 'ed' :
             x = self.model_ed(x)

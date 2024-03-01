@@ -42,46 +42,6 @@ def vids(
 
     return result
 
-
-def celeb(root_dir="Celeb-DF-v2", dataset=None, num_frames=15, net=None, fp16=False):
-    with open(os.path.join("json_file", "celeb_test.json"), "r") as f:
-        cfl = json.load(f)
-    result = set_result()
-    ky = ["Celeb-real", "Celeb-synthesis"]
-    count = 0
-    accuracy = 0
-    model = load_conswint(net, fp16)
-
-    for ck in cfl:
-        ck_ = ck.split("/")
-        klass = ck_[0]
-        filename = ck_[1]
-        correct_label = "FAKE" if klass == "Celeb-synthesis" else "REAL"
-        vid = os.path.join(root_dir, ck)
-
-        try:
-            if is_video(vid):
-                result, accuracy, count, _ = predict(
-                    vid,
-                    model,
-                    fp16,
-                    result,
-                    num_frames,
-                    net,
-                    klass,
-                    count,
-                    accuracy,
-                    correct_label,
-                )
-            else:
-                print(f"Invalid video file: {vid}. Please provide a valid video file.")
-
-        except Exception as e:
-            print(f"An error occurred x: {str(e)}")
-
-    return result
-
-
 def predict(
     vid,
     model,
@@ -99,6 +59,7 @@ def predict(
     print(f"\n\n{str(count)} Loading... {vid}")
 
     df = df_face(vid, num_frames, net)  # extract face from the frames
+   
     if fp16:
         df.half()
     y, y_val = (
@@ -117,9 +78,11 @@ def predict(
             f"\nPrediction: {y_val} {real_or_fake(y)} \t\t {accuracy}/{count} {accuracy/count}"
         )
 
+    return result, accuracy, count, [y, y_val]
+
 
 def gen_parser():
-    parser = argparse.ArgumentParser("ConSwinT prediction")
+    parser = argparse.ArgumentParser("GenConViT prediction")
     parser.add_argument("--p", type=str, help="video or image path")
     parser.add_argument(
         "--f", type=int, help="number of frames to process for prediction"

@@ -27,7 +27,7 @@ def load_conswint(net,fp16):
     config=load_config()
     model=ConSwinT(
         config,
-        ed="conswint_ed_inference",
+        ed="conswint_ed",
         vae= "conswint_vae_inference",
         net=net,
         fp16=fp16
@@ -47,7 +47,7 @@ def face_recog(frames):
     """
     temp_face=np.zeros((len(frames),224,224,3),dtype=np.uint8)
     count=0
-    mod='cnn'if dlib.DLID_USE_CUDA else "hog"        #Histogram of Oriented Gradients               
+    mod='cnn'if dlib.DLIB_USE_CUDA else "hog"        #Histogram of Oriented Gradients               
     for _,frame in tqdm(enumerate(frames),total=len(frames)):
         frame=cv2.cvtColor(frame,cv2.COLOR_RGB2BGR)
         face_locations=face_recognition.face_locations(
@@ -115,6 +115,7 @@ def extract_frames(video_file,frames_nums=10):
 def df_face(vid,num_frames,net):
     img=extract_frames(vid,num_frames)
     face,count=face_recog(img)
+    print(1)
     return preprocess_frame(face)if count >0 else []
 
 def is_video(vid):
