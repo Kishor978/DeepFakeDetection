@@ -10,10 +10,19 @@
     <h1>DeepFake Detection</h1>
     <form action="/predict" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept="video/*">
+        <select name="model_type">
+            <option value="autoencoder">Autoencoder Model</option>
+            <option value="variational">Variational Encoder Model</option>
+        </select>
         <button type="submit">Predict</button>
     </form>
     {% if prediction %}
-        <p>Prediction: {{ prediction }}</p>
+        <div class="prediction">
+            <h2>Prediction Result</h2>
+            <p>Video: {{ prediction['video']['name'] }}</p>
+            <p>Prediction: {{ prediction['video']['pred'] }}</p>
+            <p>Prediction Label: {{ prediction['video']['pred_label'] }}</p>
+        </div>
     {% endif %}
 </body>
 </html>

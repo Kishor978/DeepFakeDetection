@@ -38,5 +38,9 @@ button[type="submit"] {
   background: #6990F2;
 }
 
-/* Additional CSS styles... */
-
+/* Additional styling for prediction output */
+p.prediction {
+  color: white; /* Set text color to white */
+  font-size: 18px; /* Adjust font size for prediction text */
+  margin-top: 10px; /* Add margin space at the top */
+}
