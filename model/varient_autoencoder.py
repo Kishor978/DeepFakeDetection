@@ -77,6 +77,9 @@ class Decoder(nn.Module):
             nn.ConvTranspose2d(256, 64, kernel_size=2, stride=2),
             nn.LeakyReLU(),
 
+            nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),
+            nn.LeakyReLU(),
+
             nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2),
             nn.LeakyReLU(),
 
