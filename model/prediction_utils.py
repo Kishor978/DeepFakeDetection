@@ -126,24 +126,14 @@ def set_result():
         "video": {
             "name": [],
             "pred": [],
-            "klass": [],
             "pred_label": [],
-            "correct_label": [],
         }
     }
 
 def store_result(
-    result, filename, y, y_val, klass, correct_label=None, compression=None
+    result, filename, y, y_val
 ):
     result["video"]["name"].append(filename)
     result["video"]["pred"].append(y_val)
-    result["video"]["klass"].append(klass.lower())
     result["video"]["pred_label"].append(real_or_fake(y))
-
-    if correct_label is not None:
-        result["video"]["correct_label"].append(correct_label)
-
-    if compression is not None:
-        result["video"]["compression"].append(compression)
-
     return result
