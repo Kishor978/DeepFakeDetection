@@ -4,8 +4,7 @@ import cv2
 import torch
 import face_recognition
 import dlib
-from torchvision import transforms
-import tqdm
+from tqdm import tqdm
 from decord import VideoReader,cpu
 
 from dataloader import normalize_data
@@ -47,27 +46,28 @@ def face_recog(frames):
     """
     temp_face=np.zeros((len(frames),224,224,3),dtype=np.uint8)
     count=0
-    mod='cnn'if dlib.DLIB_USE_CUDA else "hog"        #Histogram of Oriented Gradients               
-    for _,frame in tqdm(enumerate(frames),total=len(frames)):
-        frame=cv2.cvtColor(frame,cv2.COLOR_RGB2BGR)
-        face_locations=face_recognition.face_locations(
-            frame,number_of_times_to_upsample=0,model=mod
+    mod = "cnn" if dlib.DLIB_USE_CUDA else "hog"        #Histogram of Oriented Gradients         
+    for _, frame in tqdm(enumerate(frames), total=len(frames)):
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        face_locations = face_recognition.face_locations(
+            frame, number_of_times_to_upsample=0, model=mod
         )
-        
+
         for face_location in face_locations:
-            if count<len(frames):
-                top,right,bottom,left=face_location
-                face_image=frame[top:bottom,left:right] 
-                face_image=cv2.resize(
-                    face_image,(224,224),interpolation=cv2.INTER_AREA
+            if count < len(frames):
+                top, right, bottom, left = face_location
+                face_image = frame[top:bottom, left:right]
+                face_image = cv2.resize(
+                    face_image, (224, 224), interpolation=cv2.INTER_AREA
                 )
-                face_image=cv2.cvtColor(face_image,cv2.COLOR_BGR2RGB)
-                temp_face[count]=face_image
-                count+=1
-                
+                face_image = cv2.cvtColor(face_image, cv2.COLOR_BGR2RGB)
+
+                temp_face[count] = face_image
+                count += 1
             else:
                 break
-    return ([],0) if count==0 else (temp_face[:count],count)
+
+    return ([], 0) if count == 0 else (temp_face[:count], count)
 
 
 def preprocess_frame(frame):
@@ -115,7 +115,6 @@ def extract_frames(video_file,frames_nums=10):
 def df_face(vid,num_frames,net):
     img=extract_frames(vid,num_frames)
     face,count=face_recog(img)
-    print(1)
     return preprocess_frame(face)if count >0 else []
 
 def is_video(vid):

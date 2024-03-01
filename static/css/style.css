@@ -1,0 +1,42 @@
+/* Import Google font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+/* Add your CSS styles here */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: url(bg.png);
+}
+
+h1 {
+  font-size: 40px; /* Increase the font size of h1 */
+  color: red;
+}
+
+form input[type="file"] {
+  font-size: 20px; /* Increase the font size of file input */
+  color: #2e2e2e; /* Dark gray color */
+}
+
+button[type="submit"] {
+  font-size: 24px; /* Increase the font size of the button */
+  background-color: #6990F2; /* Blue color */
+  color: #ffffff; /* White color */
+}
+
+::selection {
+  color: #fff;
+  background: #6990F2;
+}
+
+/* Additional CSS styles... */
+

@@ -161,8 +161,11 @@ cython_debug/
 
 \dlib-19.24.1-cp311-cp311-win_amd64.whl
 *.whl
+*.mp4
+*.json
 preprocesses/
 datasets/
 face_extraction.py
 weight/
+result/
 
